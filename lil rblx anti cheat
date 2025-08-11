@@ -1,0 +1,28 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local MAX_WALK_SPEED = 20
+local MAX_VERTICAL_VELOCITY = 50
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        local rootPart = character:WaitForChild("HumanoidRootPart")
+
+        RunService.Heartbeat:Connect(function()
+            if humanoid and rootPart and humanoid.Health > 0 then
+                local horizontalVelocity = Vector3.new(rootPart.Velocity.X, 0, rootPart.Velocity.Z).Magnitude
+                if horizontalVelocity > MAX_WALK_SPEED + 5 then
+                    player:Kick("Speed hacking detected.")
+                end
+
+                if math.abs(rootPart.Velocity.Y) > MAX_VERTICAL_VELOCITY then
+                    if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping and
+                       humanoid:GetState() ~= Enum.HumanoidStateType.Freefall then
+                        player:Kick("Flying detected.")
+                    end
+                end
+            end
+        end)
+    end)
+end)
